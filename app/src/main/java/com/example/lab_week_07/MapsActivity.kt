@@ -2,6 +2,7 @@ package com.example.lab_week_07
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -17,18 +18,40 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.lab_week_07.databinding.ActivityMapsBinding
+import com.google.android.gms.location.LocationServices
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
-
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
 
-    private fun getLastLocation() {
-        Log.d("MapsActivity", "getLastLocation() called")
+    private val fusedLocationProviderClient by lazy {
+        LocationServices.getFusedLocationProviderClient(this)
     }
+    private fun getLastLocation() {
+        if (hasLocationPermission()) {
+            try {
+                fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
+                    location?.let {
+                        val userLocation = LatLng(
+                            location.latitude,
+                            location.longitude
+                        )
+                        updateMapLocation(userLocation)
+                        addMarkerAtLocation(userLocation, "You")
 
+                        Log.d("MapsActivity", "$userLocation")
+
+                    }
+                }
+            } catch (e: SecurityException) {
+                Log.e("MapsActivity", "SecurityException: ${e.message}")
+            }
+        } else {
+            requestPermissionLauncher.launch(ACCESS_FINE_LOCATION)
+        }
+    }
     //This is used to check if the user already has the permission granted
     private fun hasLocationPermission() =
         ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) ==
@@ -45,6 +68,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 dialog.dismiss()
             }
             .create().show()
+    }
+
+
+
+    private fun updateMapLocation(location: LatLng) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 7f))
+    }
+
+    private fun addMarkerAtLocation(location: LatLng, title: String) {
+        mMap.addMarker(
+            MarkerOptions().title(title)
+                .position(location)
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +106,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
     }
 
-
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -82,11 +117,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
 
         when {
             hasLocationPermission() -> getLastLocation()

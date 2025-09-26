@@ -1,6 +1,6 @@
 [versions]
 agp = "8.12.3"
-kotlin = "2.0.21"
+kotlin = "2.2.20"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -12,7 +12,8 @@ constraintlayout = "2.2.1"
 androidx-activity = "1.11.0"
 androidx-fragment = "1.8.9"
 googleAndroidLibrariesMapsplatformSecretsGradlePlugin = "2.0.1"
-playServicesMaps = "18.1.0"
+playServicesMaps = "19.2.0"
+play-services-location = "21.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,6 +27,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
